@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import CreateDocumentForm from './CreateDocumentForm';
-import DocumentList from './DocumentList';
-import { bulkDeleteDocuments, createDocument, fetchDocuments } from './api';
-import type { Doc } from './types';
+import { useCallback, useEffect, useState } from "react";
+import CreateDocumentForm from "./CreateDocumentForm";
+import DocumentList from "./DocumentList";
+import { bulkDeleteDocuments, createDocument, fetchDocuments } from "./api";
+import type { Doc } from "./types";
 
-const GENERIC_ERROR = 'Something went wrong. Please try again.';
+const GENERIC_ERROR = "Something went wrong. Please try again.";
 
 export default function App() {
   const [documents, setDocuments] = useState<Doc[]>([]);
@@ -12,8 +12,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // removed the first setLoading(true) from the load function to avoid flicker on initial load
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       setDocuments(await fetchDocuments());
     } catch {
@@ -38,7 +38,11 @@ export default function App() {
   };
 
   const handleDeleteSelected = async () => {
-    if (!window.confirm(`Delete ${selectedIds.length} document(s)? This cannot be undone.`)) {
+    if (
+      !window.confirm(
+        `Delete ${selectedIds.length} document(s)? This cannot be undone.`,
+      )
+    ) {
       return;
     }
 
@@ -63,7 +67,8 @@ export default function App() {
           onClick={handleDeleteSelected}
           disabled={selectedIds.length === 0}
         >
-          Delete selected{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}
+          Delete selected
+          {selectedIds.length > 0 ? ` (${selectedIds.length})` : ""}
         </button>
       </header>
 

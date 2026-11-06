@@ -1,6 +1,11 @@
-import { ConflictException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { Document } from './document.model';
-import { DocumentsStore } from './documents.store';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from "@nestjs/common";
+import { Document } from "./document.model";
+import { DocumentsStore } from "./documents.store";
 
 @Injectable()
 export class DocumentsService implements OnModuleInit {
@@ -14,12 +19,21 @@ export class DocumentsService implements OnModuleInit {
     this.documentsCache = this.store.all();
   }
 
+  // add a refreshCache function to update the cache after a document is created or deleted
+  private refreshCache(): void {
+    this.documentsCache = this.store.all();
+  }
+
   async findAll(): Promise<Document[]> {
     return this.documentsCache;
   }
 
+  // added a create function to insert a new document into the store and refresh the cache.
   async create(title: string): Promise<Document> {
-    return this.store.insert(title);
+    const document = this.store.insert(title);
+    this.refreshCache();
+
+    return document;
   }
 
   async delete(id: string): Promise<void> {
@@ -30,9 +44,12 @@ export class DocumentsService implements OnModuleInit {
     }
 
     if (document.lockedBy !== null) {
-      throw new ConflictException(`Document ${id} is locked by ${document.lockedBy}`);
+      throw new ConflictException(
+        `Document ${id} is locked by ${document.lockedBy}`,
+      );
     }
 
     this.store.remove(id);
+    this.refreshCache();
   }
 }

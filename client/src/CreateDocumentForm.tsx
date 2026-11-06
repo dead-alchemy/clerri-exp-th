@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface CreateDocumentFormProps {
   onCreate: (title: string) => Promise<void>;
 }
 
-export default function CreateDocumentForm({ onCreate }: CreateDocumentFormProps) {
-  const [title, setTitle] = useState('');
+export default function CreateDocumentForm({
+  onCreate,
+}: CreateDocumentFormProps) {
+  const [title, setTitle] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -15,9 +17,15 @@ export default function CreateDocumentForm({ onCreate }: CreateDocumentFormProps
     if (!trimmed) return;
 
     setSubmitting(true);
-    await onCreate(trimmed);
-    setSubmitting(false);
-    setTitle('');
+    // Updated to try, catch, finally to handle errors and ensure submitting state is reset
+    try {
+      await onCreate(trimmed);
+      setTitle("");
+    } catch {
+      alert("Failed to create document. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
